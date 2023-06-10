@@ -27,6 +27,7 @@ async function run() {
     client.connect();
     const usersCollection = client.db("languageDb").collection("users");
     const paymentCollection = client.db("languageDb").collection("payments");
+    const classCollection = client.db("languageDb").collection("classes");
 
     // create payment intent----------------------------------------------
     app.post('/create-payment-intent', async (req, res) => {
@@ -82,6 +83,11 @@ async function run() {
 
     })
 
+    //class related api-------------------------------------------------
+    app.get('/classes', async (req, res) => {
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    });
     // payment related api--------------------------------------------------
     app.get('/payments', async (req, res) => {
       const result = await paymentCollection.find().toArray();
