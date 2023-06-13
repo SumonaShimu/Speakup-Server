@@ -95,7 +95,6 @@ async function run() {
     // cart apis---------------------------------------------
     app.get('/carts', async (req, res) => {
       const email = req.query.email;
-
       if (!email) {
         res.send([]);
       }
@@ -121,6 +120,15 @@ async function run() {
     // payment related api--------------------------------------------------
     app.get('/payments', async (req, res) => {
       const result = await paymentCollection.find().toArray();
+      res.send(result);
+    });
+    app.get('/payments/:email', async (req, res) => {
+      const email=req.params.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await paymentCollection.find(query).sort({ date: -1 }).toArray();
       res.send(result);
     });
 
