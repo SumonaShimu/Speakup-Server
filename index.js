@@ -28,7 +28,7 @@ async function run() {
     const usersCollection = client.db("languageDb").collection("users");
     const paymentCollection = client.db("languageDb").collection("payments");
     const classCollection = client.db("languageDb").collection("classes");
-    const cartCollection = client.db("bistroDb").collection("carts");
+    const cartCollection = client.db("languageDb").collection("carts");
 
     // create payment intent----------------------------------------------
     app.post('/create-payment-intent', async (req, res) => {
