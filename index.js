@@ -28,6 +28,7 @@ async function run() {
     const usersCollection = client.db("languageDb").collection("users");
     const paymentCollection = client.db("languageDb").collection("payments");
     const classCollection = client.db("languageDb").collection("classes");
+    const cartCollection = client.db("bistroDb").collection("carts");
 
     // create payment intent----------------------------------------------
     app.post('/create-payment-intent', async (req, res) => {
@@ -60,14 +61,16 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/users/admin/:email', async (req, res) => {
+    //returns role of a user
+    app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email: email }
       const user = await usersCollection.findOne(query);
-      const result = { admin: user?.role === 'admin' }
-      res.send(result);
+      const role = user.role
+      res.send(role);
     })
 
+    //make admin
     app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -88,6 +91,33 @@ async function run() {
       const result = await classCollection.find().toArray();
       res.send(result);
     });
+
+    // cart apis---------------------------------------------
+    app.get('/carts', async (req, res) => {
+      const email = req.query.email;
+
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await cartCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post('/carts', async (req, res) => {
+      const item = req.body;
+      const result = await cartCollection.insertOne(item);
+      res.send(result);
+    })
+
+    app.delete('/carts/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    })
+
+
     // payment related api--------------------------------------------------
     app.get('/payments', async (req, res) => {
       const result = await paymentCollection.find().toArray();
