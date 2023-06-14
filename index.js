@@ -73,35 +73,19 @@ async function run() {
       res.send(role);
     })
 
-    //make admin
-    app.patch('/users/admin/:id', async (req, res) => {
+    //make admin or ins
+    app.patch('/users/update/:id', async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
+      const updateddoc = req.body;
+      console.log('81 id: ',id);
+      const updatedDoc = {
         $set: {
-          role: 'admin'
-        },
-      };
-
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
-
-    })
-    //make instructor
-    app.patch('/users/instructor/:id', async (req, res) => {
-      const id = req.params.id;
-      console.log(id);
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          role: 'instructor'
-        },
-      };
-
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
-
+          ...updateddoc
+        }
+      }
+      const result = await usersCollection.updateOne(filter, updatedDoc)
+      res.send(result)
     })
 
     //class related api-------------------------------------------------
