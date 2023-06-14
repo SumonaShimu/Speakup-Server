@@ -94,6 +94,41 @@ async function run() {
       const result = await classCollection.find().toArray();
       res.send(result);
     });
+    app.get('/classes/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const result = await classCollection.findOne(filter);
+      res.send(result);
+    });
+
+    app.patch('/classes/:id', async (req, res) => {
+      const classId = req.params.id;
+      const classObj = await classCollection.findOne({ _id: ObjectId(classId) });
+
+      if (classObj) {
+        // Calculate the updated values
+        const updatedSeats = classObj.availableSeats - 1;
+        const updatedStudents = classObj.students + 1;
+
+        // Update the class with the new values
+        const result = await classCollection.findOneAndUpdate(
+          { _id: ObjectId(classId) },
+          {
+            $set: {
+              availableSeats: updatedSeats,
+              students: updatedStudents
+            }
+          },
+          { returnOriginal: false }
+        );
+
+        res.status(200).json({ message: 'Class updated successfully.', class: result.value });
+      } else {
+        res.status(404).json({ error: 'Class not found.' });
+      }
+
+    });
 
     // cart apis---------------------------------------------
     app.get('/carts', async (req, res) => {
@@ -125,8 +160,9 @@ async function run() {
       const result = await paymentCollection.find().toArray();
       res.send(result);
     });
+
     app.get('/payments/:email', async (req, res) => {
-      const email=req.params.email;
+      const email = req.params.email;
       if (!email) {
         res.send([]);
       }
