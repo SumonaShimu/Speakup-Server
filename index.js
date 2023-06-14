@@ -88,12 +88,28 @@ async function run() {
       res.send(result);
 
     })
+    //make instructor
+    app.patch('/users/instructor/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'instructor'
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+
+    })
 
     //class related api-------------------------------------------------
     app.get('/classes', async (req, res) => {
       const result = await classCollection.find().toArray();
       res.send(result);
     });
+
     app.get('/classes/:email', async (req, res) => {
 
       const email = req.params.email;
@@ -105,8 +121,6 @@ async function run() {
       res.send(result);
       
     });
-
-
     app.get('/classes/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -127,8 +141,8 @@ async function run() {
 
       if (classObj) {
         // Calculate the updated values
-        const updatedSeats = classObj.availableSeats - 1;
-        const updatedStudents = classObj.students + 1;
+        const updatedSeats = parseInt(classObj.availableSeats) - 1;
+        const updatedStudents = parseInt(classObj.students) + 1;
 
         // Update the class with the new values
         const result = await classCollection.findOneAndUpdate(
@@ -148,6 +162,41 @@ async function run() {
       }
 
     });
+
+    //approved
+    app.patch('/classes/approved/:id', async (req, res) => {
+      const id = req.params.id;
+      const newstatus='approved'
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: newstatus,
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
+    //deny
+    app.patch('/classes/denied/:id', async (req, res) => {
+      const id = req.params.id;
+      const feedbackText=req.body;
+      const newstatus='denied'
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          status: newstatus,
+          feedback: feedbackText
+        },
+      };
+
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+
+    })
+
 
     // cart apis---------------------------------------------
     app.get('/carts', async (req, res) => {
