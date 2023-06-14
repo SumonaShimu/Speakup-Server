@@ -163,39 +163,21 @@ async function run() {
 
     });
 
-    //approved
-    app.patch('/classes/approved/:id', async (req, res) => {
+    //approved or deny class
+    app.patch('/classes/update/:id', async (req, res) => {
       const id = req.params.id;
-      const newstatus='approved'
-      console.log(id);
       const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
+      const updateddoc = req.body;
+      console.log('171 id: ',id);
+      const updatedDoc = {
         $set: {
-          status: newstatus,
-        },
-      };
-
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
+          ...updateddoc
+        }
+      }
+      const result = await classCollection.updateOne(filter, updatedDoc)
+      res.send(result)
     })
-    //deny
-    app.patch('/classes/denied/:id', async (req, res) => {
-      const id = req.params.id;
-      const feedbackText=req.body;
-      const newstatus='denied'
-      console.log(id);
-      const filter = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          status: newstatus,
-          feedback: feedbackText
-        },
-      };
-
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result);
-
-    })
+  
 
 
     // cart apis---------------------------------------------
@@ -247,7 +229,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
 
