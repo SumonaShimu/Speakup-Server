@@ -94,6 +94,19 @@ async function run() {
       const result = await classCollection.find().toArray();
       res.send(result);
     });
+    app.get('/classes/:email', async (req, res) => {
+
+      const email = req.params.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { instructor: email };
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+      
+    });
+
+
     app.get('/classes/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -102,9 +115,15 @@ async function run() {
       res.send(result);
     });
 
+    app.post('/classes', async (req, res) => {
+      const newclass = req.body;
+      const result = await classCollection.insertOne(newclass);
+      res.send(result);
+    });
+
     app.patch('/classes/:id', async (req, res) => {
       const classId = req.params.id;
-      const classObj = await classCollection.findOne({ _id: ObjectId(classId) });
+      const classObj = await classCollection.findOne({ _id: new ObjectId(classId) });
 
       if (classObj) {
         // Calculate the updated values
@@ -113,7 +132,7 @@ async function run() {
 
         // Update the class with the new values
         const result = await classCollection.findOneAndUpdate(
-          { _id: ObjectId(classId) },
+          { _id: new ObjectId(classId) },
           {
             $set: {
               availableSeats: updatedSeats,
